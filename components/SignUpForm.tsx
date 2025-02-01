@@ -47,8 +47,12 @@ function LoginForm() {
 				onSuccess: () => {
 					form.reset();
 				},
-				onError: (ctx) => {
-					alert(ctx.error.message);
+				onError: () => {
+					toast({
+						title: "Error",
+						description: error?.message,
+						variant: "destructive",
+					});
 				},
 			}
 		);
