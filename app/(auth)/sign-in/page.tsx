@@ -26,7 +26,7 @@ const SignIn = () => {
 					Don&apos;t have and account?
 					<Link
 						href='/sign-up'
-						className='text-primary hover:underline'
+						className='text-primary hover:underline mx-1'
 					>
 						Sign Up
 					</Link>

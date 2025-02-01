@@ -14,6 +14,8 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { signUp } from "@/lib/auth-client";
+import { toast } from "@/hooks/use-toast";
 
 function LoginForm() {
 	const form = useForm<z.infer<typeof signUpFormSchema>>({
@@ -26,8 +28,30 @@ function LoginForm() {
 	});
 
 	// 2. Define a submit handler.
-	function onSubmit(values: z.infer<typeof signUpFormSchema>) {
-		console.log(values);
+	async function onSubmit(values: z.infer<typeof signUpFormSchema>) {
+		const { name, email, password } = values;
+		const { data, error } = await signUp.email(
+			{
+				email,
+				password,
+				name,
+				callbackURL: "/user",
+			},
+			{
+				onRequest: () => {
+					toast({
+						title: "Signing Up",
+						description: "Please wait...",
+					});
+				},
+				onSuccess: () => {
+					form.reset();
+				},
+				onError: (ctx) => {
+					alert(ctx.error.message);
+				},
+			}
+		);
 	}
 	return (
 		<Form {...form}>

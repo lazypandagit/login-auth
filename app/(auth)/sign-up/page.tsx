@@ -13,7 +13,7 @@ const SignUp = () => {
 	return (
 		<Card className='w-full max-w-md mx-auto'>
 			<CardHeader>
-				<CardTitle>Sign Up</CardTitle>
+				<CardTitle className='text-4xl'>Sign Up</CardTitle>
 				<CardDescription>Create your account to get started.</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -24,7 +24,7 @@ const SignUp = () => {
 					Already have an account?
 					<Link
 						href='/sign-in'
-						className='text-primary hover:underline mx-4'
+						className='text-primary hover:underline mx-1'
 					>
 						Log in
 					</Link>
