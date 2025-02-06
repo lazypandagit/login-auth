@@ -25,17 +25,23 @@ const Navbar = async () => {
 				</Link>
 				<div className='flex gap-4 items-center justify-center'>
 					{session ? (
-						<form
-							action={async () => {
-								"use server";
-								await auth.api.signOut({
-									headers: await headers(),
-								});
-								redirect("/");
-							}}
-						>
-							<Button>Sign Out</Button>
-						</form>
+						<>
+							<p className='text-sm text-end'>
+								Logged in as <br />
+								<span className='text-semibold'>{session?.user?.name}</span>
+							</p>
+							<form
+								action={async () => {
+									"use server";
+									await auth.api.signOut({
+										headers: await headers(),
+									});
+									redirect("/");
+								}}
+							>
+								<Button>Sign Out</Button>
+							</form>
+						</>
 					) : (
 						<Link
 							href='/sign-in'

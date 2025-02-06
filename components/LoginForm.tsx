@@ -13,11 +13,15 @@ import {
 	FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import { signIn } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import LoadingButton from "./LoadingButton";
+import { Separator } from "./ui/separator";
+import SocialLogin from "./SocialLogin";
 
 function LoginForm() {
+	const [pending, setPending] = useState(false);
 	const form = useForm<z.infer<typeof loginFormSchema>>({
 		resolver: zodResolver(loginFormSchema),
 		defaultValues: {
@@ -29,7 +33,7 @@ function LoginForm() {
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof loginFormSchema>) {
 		const { email, password } = values;
-		const { data, error } = await signIn.email(
+		await signIn.email(
 			{
 				email,
 				password,
@@ -37,15 +41,18 @@ function LoginForm() {
 			},
 			{
 				onRequest: () => {
+					setPending(true);
 					toast({
 						title: "Logging In...",
 						description: "Please wait...",
 					});
 				},
 				onSuccess: () => {
+					setPending(false);
 					form.reset();
 				},
 				onError: () => {
+					setPending(false);
 					toast({
 						title: "Invalid Email or Password",
 						description: "Please try again",
@@ -56,50 +63,51 @@ function LoginForm() {
 	}
 	return (
 		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className='space-y-4'
-			>
-				<FormField
-					control={form.control}
-					name='email'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Email</FormLabel>
-							<FormControl>
-								<Input
-									placeholder='example@mail.com'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name='password'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Password</FormLabel>
-							<FormControl>
-								<Input
-									type='password'
-									placeholder='Password'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<Button
-					className='w-full'
-					type='submit'
+			<div>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className='space-y-4'
 				>
-					Submit
-				</Button>
-			</form>
+					<FormField
+						control={form.control}
+						name='email'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<Input
+										placeholder='example@mail.com'
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='password'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Password</FormLabel>
+								<FormControl>
+									<Input
+										type='password'
+										placeholder='Password'
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<LoadingButton pending={pending}>Login</LoadingButton>
+				</form>
+			</div>
+			<Separator className='my-3' />
+			<div className='space-y-2'>
+				<SocialLogin />
+			</div>
 		</Form>
 	);
 }

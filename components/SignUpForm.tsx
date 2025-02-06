@@ -13,11 +13,17 @@ import {
 	FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import { signUp } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import LoadingButton from "./LoadingButton";
+import { Separator } from "./ui/separator";
+import SocialLogin from "./SocialLogin";
+import { useRouter } from "next/navigation";
 
 function LoginForm() {
+	const router = useRouter();
+	const [pending, setPending] = useState(false);
 	const form = useForm<z.infer<typeof signUpFormSchema>>({
 		resolver: zodResolver(signUpFormSchema),
 		defaultValues: {
@@ -30,27 +36,27 @@ function LoginForm() {
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof signUpFormSchema>) {
 		const { name, email, password } = values;
-		const { data, error } = await signUp.email(
+		await signUp.email(
 			{
 				email,
 				password,
 				name,
-				callbackURL: "/user",
 			},
 			{
 				onRequest: () => {
-					toast({
-						title: "Signing Up",
-						description: "Please wait...",
-					});
+					setPending(true);
 				},
 				onSuccess: () => {
+					setPending(false);
 					form.reset();
+					router.push("/user");
+					router.refresh();
 				},
-				onError: () => {
+				onError: (ctx) => {
+					setPending(false);
 					toast({
-						title: "Error",
-						description: error?.message,
+						title: ctx.error.error,
+						description: ctx.error.message,
 						variant: "destructive",
 					});
 				},
@@ -59,66 +65,67 @@ function LoginForm() {
 	}
 	return (
 		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className='space-y-4'
-			>
-				<FormField
-					control={form.control}
-					name='name'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Name</FormLabel>
-							<FormControl>
-								<Input
-									placeholder='John Doe'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name='email'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Email</FormLabel>
-							<FormControl>
-								<Input
-									placeholder='example@mail.com'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name='password'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Password</FormLabel>
-							<FormControl>
-								<Input
-									type='password'
-									placeholder='Password'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<Button
-					className='w-full'
-					type='submit'
+			<div>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className='space-y-4'
 				>
-					Submit
-				</Button>
-			</form>
+					<FormField
+						control={form.control}
+						name='name'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Name</FormLabel>
+								<FormControl>
+									<Input
+										placeholder='John Doe'
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='email'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<Input
+										placeholder='example@mail.com'
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='password'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Password</FormLabel>
+								<FormControl>
+									<Input
+										type='password'
+										placeholder='Password'
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<LoadingButton pending={pending}>Sign up</LoadingButton>
+				</form>
+			</div>
+			<Separator className='my-3' />
+			<div className='space-y-2'>
+				<SocialLogin />
+			</div>
 		</Form>
 	);
 }
