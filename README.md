@@ -4,12 +4,13 @@ A simple to-do app
 
 This is a simple implementation of a typical authentication flow using [React19](react.dev) [Next.js](https://nextjs.org/), [BetterAuth](https://www.better-auth.com/), [Prisma](https://www.prisma.io/) ORM and [Postgresql](https://www.postgresql.org/).
 
-## Currently Deployed on \_\_\_
+## Currently Deployed on [Vercel](https://login-auth-wheat.vercel.app/)
 
 ## Things yet to be implemented
 
 - Email Verification flow.
   - Sending verificatin links.
+- Configure JWT tokens
 - Signing in with Google.
 - The to-do functionality afte loging in.
 
